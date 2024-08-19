@@ -58,29 +58,29 @@
 
 ## `std::option::Option`
 
-- [ ] and
-- [ ] and_then
-- [ ] cloned
-- [ ] expect
-- [ ] filter
-- [ ] inspect
-- [ ] is_none
-- [ ] is_some
+- [x] and
+- [x] and_then
+- [x] cloned
+- [x] expect
+- [x] filter
+- [x] inspect
+- [x] is_none
+- [x] is_some
 - [ ] iter
-- [ ] map
-- [ ] map_or
-- [ ] map_or_else
-- [ ] ok_or
-- [ ] ok_or_else
-- [ ] or
-- [ ] or_else
-- [ ] replace
-- [ ] take
-- [ ] unwrap
-- [ ] unwrap_or
-- [ ] unwrap_or_else
-- [ ] xor
-- [ ] zip
+- [x] map
+- [x] map_or
+- [x] map_or_else
+- [x] ok_or
+- [x] ok_or_else
+- [x] or
+- [x] or_else
+- [x] replace
+- [x] take
+- [x] unwrap
+- [x] unwrap_or
+- [x] unwrap_or_else
+- [x] xor
+- [x] zip
 
 ## `std::result::Result`
 
