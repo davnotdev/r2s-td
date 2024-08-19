@@ -26,7 +26,7 @@ namespace R2STD {
     }
 
     inspect(f: (v: T) => void): Option<T> {
-      this.map(() => f(this.data!));
+      this.map((v) => f(v));
       return this;
     }
 
@@ -69,11 +69,25 @@ namespace R2STD {
     }
 
     or(o: Option<T>): Option<T> {
-      return this.is_some() ? this : o;
+      if (this.is_some()) {
+        return this;
+      } else if (o.is_some()) {
+        return o;
+      } else {
+        return Option.from_none();
+      }
     }
 
-    or_else(o: () => Option<T>): Option<T> {
-      return this.is_some() ? this : o();
+    or_else(f: () => Option<T>): Option<T> {
+      if (this.is_some()) {
+        return this;
+      }
+      let o = f();
+      if (o.is_some()) {
+        return o;
+      } else {
+        return Option.from_none();
+      }
     }
 
     replace(v: T): Option<T> {
@@ -117,7 +131,6 @@ namespace R2STD {
         : Option.from_none();
     }
 
-    // Please never use this.
     constructor() {
       this.data = null;
     }
@@ -136,18 +149,146 @@ namespace R2STD {
 
   export class Result<T, E> {
     data: T | E;
+    data_is_ok: boolean;
 
-    // Please never use this.
-    constructor(v: T | E) {
+    and<U>(o: Result<U, E>): Result<U, E> {
+      return this.is_ok() ? o : Result.from_err(this.data! as E);
+    }
+
+    and_then<U>(f: (v: T) => Result<U, E>): Result<U, E> {
+      return this.is_ok()
+        ? f(this.data! as T)
+        : Result.from_err(this.data! as E);
+    }
+
+    cloned(): Result<T, E> {
+      return structuredClone(this);
+    }
+
+    err(): Option<E> {
+      return this.is_err()
+        ? Option.from_some(this.data! as E)
+        : Option.from_none();
+    }
+
+    expect(msg: string): T {
+      if (this.is_err()) {
+        throw msg;
+      }
+      return this.data! as T;
+    }
+
+    expect_err(msg: string): E {
+      if (this.is_ok()) {
+        throw msg;
+      }
+      return this.data! as E;
+    }
+
+    inspect(f: (v: T) => void): Result<T, E> {
+      this.map((v) => f(v));
+      return this;
+    }
+
+    inspect_err(f: (v: E) => void): Result<T, E> {
+      this.map_err((v) => f(v));
+      return this;
+    }
+
+    is_err(): boolean {
+      return !this.data_is_ok;
+    }
+
+    is_ok(): boolean {
+      return this.data_is_ok;
+    }
+
+    iter() {}
+
+    map<U>(f: (v: T) => U): Result<U, E> {
+      return this.is_ok()
+        ? Result.from_ok(f(this.data! as T))
+        : Result.from_err(this.data! as E);
+    }
+
+    map_err<U>(f: (v: E) => U): Result<T, U> {
+      return this.is_err()
+        ? Result.from_err(f(this.data! as E))
+        : Result.from_ok(this.data! as T);
+    }
+
+    map_or<U>(default_: U, f: (v: T) => U): Result<U, E> {
+      return this.is_ok()
+        ? Result.from_ok(f(this.data! as T))
+        : Result.from_ok(default_);
+    }
+    map_or_else<U>(default_: (e: E) => U, f: (v: T) => U): Result<U, E> {
+      return this.is_ok()
+        ? Result.from_ok(f(this.data! as T))
+        : Result.from_ok(default_(this.data! as E));
+    }
+
+    ok(): Option<T> {
+      return this.is_ok()
+        ? Option.from_some(this.data! as T)
+        : Option.from_none();
+    }
+
+    or(o: Result<T, E>): Result<T, E> {
+      if (this.is_ok()) {
+        return this;
+      } else if (o.is_ok()) {
+        return o;
+      } else {
+        return Result.from_err(this.data! as E);
+      }
+    }
+
+    or_else(f: (e: E) => Result<T, E>): Result<T, E> {
+      if (this.is_ok()) {
+        return this;
+      }
+      let o = f(this.data! as E);
+      if (o.is_ok()) {
+        return o;
+      } else {
+        return Result.from_err(this.data! as E);
+      }
+    }
+
+    unwrap() {
+      if (this.is_err()) {
+        throw "called `Result.unwrap()` on a `Err` value";
+      }
+      return this.data!;
+    }
+
+    unwrap_err() {
+      if (this.is_ok()) {
+        throw "called `Result.unwrap()` on a `Ok()` value";
+      }
+      return this.data!;
+    }
+
+    unwrap_or(v: T): T {
+      return this.is_ok() ? (this.data! as T) : v;
+    }
+
+    unwrap_or_else(f: () => T): T {
+      return this.is_ok() ? (this.data! as T) : f();
+    }
+
+    constructor(v: T | E, data_is_ok: boolean) {
       this.data = v;
+      this.data_is_ok = data_is_ok;
     }
 
     static from_ok<T, E>(data: T): Result<T, E> {
-      return new Result<T, E>(data);
+      return new Result<T, E>(data, true);
     }
 
     static from_err<T, E>(error: E): Result<T, E> {
-      return new Result<T, E>(error);
+      return new Result<T, E>(error, false);
     }
   }
 

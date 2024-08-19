@@ -84,27 +84,29 @@
 
 ## `std::result::Result`
 
-- [ ] and
-- [ ] and_then
-- [ ] cloned
-- [ ] err
-- [ ] expect
-- [ ] expect_err
-- [ ] inspect
-- [ ] inspect_err
-- [ ] is_err
-- [ ] is_ok
+- [x] and
+- [x] and_then
+- [x] cloned
+- [x] err
+- [x] expect
+- [x] expect_err
+- [x] inspect
+- [x] inspect_err
+- [x] is_err
+- [x] is_ok
 - [ ] iter
-- [ ] map
-- [ ] map_err
-- [ ] map_or
-- [ ] map_or_else
-- [ ] ok
-- [ ] or
-- [ ] or_else
-- [ ] unwrap
-- [ ] unwrap_err
-- [ ] unwrap_or
-- [ ] unwrap_or_else
+- [x] map
+- [x] map_err
+- [x] map_or
+- [x] map_or_else
+- [x] ok
+- [x] or
+- [x] or_else
+- [x] unwrap
+- [x] unwrap_err
+- [x] unwrap_or
+- [x] unwrap_or_else
+
 ```
 
+```
