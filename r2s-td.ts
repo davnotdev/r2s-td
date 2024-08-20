@@ -5,11 +5,11 @@ namespace R2STD {
 
   export class Option<T> {
     and<U>(o: Option<U>): Option<U> {
-      return this.is_some() ? o : Option.from_none();
+      return this.isSome() ? o : Option.fromNone();
     }
 
-    and_then<U>(f: (v: T) => Option<U>) {
-      return this.is_some() ? f(this.data!) : Option.from_none();
+    andThen<U>(f: (v: T) => Option<U>) {
+      return this.isSome() ? f(this.data!) : Option.fromNone();
     }
 
     cloned(): Option<T> {
@@ -17,22 +17,22 @@ namespace R2STD {
     }
 
     expect(msg: string): T {
-      if (this.is_none()) {
+      if (this.isNone()) {
         throw msg;
       }
       return this.data!;
     }
 
     filter(f: (v: T) => boolean): Option<T> {
-      return this.is_some() && f(this.data!) ? this : Option.from_none();
+      return this.isSome() && f(this.data!) ? this : Option.fromNone();
     }
 
     flatten(this: Option<Option<T>>): Option<T> {
-      return this.is_some() ? this.unwrap() : Option.from_none();
+      return this.isSome() ? this.unwrap() : Option.fromNone();
     }
 
-    get_or_insert(v: T): T {
-      if (this.is_none()) {
+    getOrInsert(v: T): T {
+      if (this.isNone()) {
         this.data = v;
       }
       return this.data!;
@@ -48,148 +48,148 @@ namespace R2STD {
       return this;
     }
 
-    is_none(): boolean {
+    isNone(): boolean {
       return this == null;
     }
 
-    is_some(): boolean {
+    isSome(): boolean {
       return this != null;
     }
 
-    is_some_and(f: (v: T) => boolean): boolean {
+    isSomeAnd(f: (v: T) => boolean): boolean {
       return this != null && f(this.data!);
     }
 
     iter(): Iterator<T> {
-      return this.is_some() ? new Iterator([this.data!]) : new Iterator([]);
+      return this.isSome() ? new Iterator([this.data!]) : new Iterator([]);
     }
 
     map<U>(f: (v: T) => U): Option<U> {
-      return this.is_some()
-        ? Option.from_some(f(this.data!))
-        : Option.from_none();
+      return this.isSome()
+        ? Option.fromSome(f(this.data!))
+        : Option.fromNone();
     }
 
-    map_or<U>(default_: U, f: (v: T) => U): Option<U> {
-      return this.is_some()
-        ? Option.from_some(f(this.data!))
-        : Option.from_some(default_);
+    mapOr<U>(default_: U, f: (v: T) => U): Option<U> {
+      return this.isSome()
+        ? Option.fromSome(f(this.data!))
+        : Option.fromSome(default_);
     }
 
-    map_or_else<U>(default_: () => U, f: (v: T) => U): Option<U> {
-      return this.is_some()
-        ? Option.from_some(f(this.data!))
-        : Option.from_some(default_());
+    mapOrElse<U>(default_: () => U, f: (v: T) => U): Option<U> {
+      return this.isSome()
+        ? Option.fromSome(f(this.data!))
+        : Option.fromSome(default_());
     }
 
-    ok_or<E>(err: E): Result<T, E> {
-      return this.is_some() ? Result.from_ok(this.data!) : Result.from_err(err);
+    okOr<E>(err: E): Result<T, E> {
+      return this.isSome() ? Result.fromOk(this.data!) : Result.fromErr(err);
     }
 
-    ok_or_else<E>(err: () => E): Result<T, E> {
-      return this.is_some()
-        ? Result.from_ok(this.data!)
-        : Result.from_err(err());
+    okOrElse<E>(err: () => E): Result<T, E> {
+      return this.isSome()
+        ? Result.fromOk(this.data!)
+        : Result.fromErr(err());
     }
 
     or(o: Option<T>): Option<T> {
-      if (this.is_some()) {
+      if (this.isSome()) {
         return this;
-      } else if (o.is_some()) {
+      } else if (o.isSome()) {
         return o;
       } else {
-        return Option.from_none();
+        return Option.fromNone();
       }
     }
 
-    or_else(f: () => Option<T>): Option<T> {
-      if (this.is_some()) {
+    orElse(f: () => Option<T>): Option<T> {
+      if (this.isSome()) {
         return this;
       }
       let o = f();
-      if (o.is_some()) {
+      if (o.isSome()) {
         return o;
       } else {
-        return Option.from_none();
+        return Option.fromNone();
       }
     }
 
     replace(v: T): Option<T> {
       let old = this.data;
       this.data = v;
-      return this.is_some() ? Option.from_some(old!) : Option.from_none();
+      return this.isSome() ? Option.fromSome(old!) : Option.fromNone();
     }
 
     take(): Option<T> {
       let old = this.data;
       this.data = null;
-      return this.is_some() ? Option.from_some(old!) : Option.from_none();
+      return this.isSome() ? Option.fromSome(old!) : Option.fromNone();
     }
 
-    take_if(f: (v: T) => boolean): Option<T> {
-      if (this.is_some() && f(this.data!)) {
+    takeIf(f: (v: T) => boolean): Option<T> {
+      if (this.isSome() && f(this.data!)) {
         let old = this.data;
         this.data = null;
-        return this.is_some() ? Option.from_some(old!) : Option.from_none();
+        return this.isSome() ? Option.fromSome(old!) : Option.fromNone();
       } else {
-        return Option.from_none();
+        return Option.fromNone();
       }
     }
 
     transpose<E>(this: Option<Result<T, E>>): Result<Option<T>, E> {
-      if (this.is_some()) {
+      if (this.isSome()) {
         let res = this.data!;
-        return res.is_ok()
-          ? Result.from_ok(Option.from_some(res.unwrap()))
-          : Result.from_err(res.unwrap_err());
+        return res.isOk()
+          ? Result.fromOk(Option.fromSome(res.unwrap()))
+          : Result.fromErr(res.unwrapErr());
       }
-      return Result.from_ok(Option.from_none());
+      return Result.fromOk(Option.fromNone());
     }
 
     unwrap(): T {
-      if (this.is_none()) {
+      if (this.isNone()) {
         throw "called `Option.unwrap()` on a `None` value";
       }
       return this.data!;
     }
 
-    unwrap_or(v: T): T {
-      return this.is_some() ? this.data! : v;
+    unwrapOr(v: T): T {
+      return this.isSome() ? this.data! : v;
     }
 
-    unwrap_or_else(f: () => T) {
-      return this.is_some() ? this.data! : f();
+    unwrapOrElse(f: () => T) {
+      return this.isSome() ? this.data! : f();
     }
 
     unzip<U>(this: Option<[T, U]>): [Option<T>, Option<U>] {
-      return this.is_some()
-        ? [Option.from_some(this.data![0]), Option.from_some(this.data![1])]
-        : [Option.from_none(), Option.from_none()];
+      return this.isSome()
+        ? [Option.fromSome(this.data![0]), Option.fromSome(this.data![1])]
+        : [Option.fromNone(), Option.fromNone()];
     }
 
     xor(o: Option<T>): Option<T> {
-      if (this.is_some() && o.is_some()) {
-        return Option.from_none();
+      if (this.isSome() && o.isSome()) {
+        return Option.fromNone();
       } else {
         return this.or(o);
       }
     }
 
     zip<U>(o: Option<U>): Option<[T, U]> {
-      return this.is_some() && o.is_some()
-        ? Option.from_some([this.data!, o.data!])
-        : Option.from_none();
+      return this.isSome() && o.isSome()
+        ? Option.fromSome([this.data!, o.data!])
+        : Option.fromNone();
     }
 
     constructor(private data: T | null) {
       this.data = data;
     }
 
-    static from_some<T>(data: T): Option<T> {
+    static fromSome<T>(data: T): Option<T> {
       return new Option<T>(data);
     }
 
-    static from_none<T>(): Option<T> {
+    static fromNone<T>(): Option<T> {
       return new Option<T>(null);
     }
   }
@@ -200,13 +200,13 @@ namespace R2STD {
 
   export class Result<T, E> {
     and<U>(o: Result<U, E>): Result<U, E> {
-      return this.is_ok() ? o : Result.from_err(this.data! as E);
+      return this.isOk() ? o : Result.fromErr(this.data! as E);
     }
 
-    and_then<U>(f: (v: T) => Result<U, E>): Result<U, E> {
-      return this.is_ok()
+    andThen<U>(f: (v: T) => Result<U, E>): Result<U, E> {
+      return this.isOk()
         ? f(this.data! as T)
-        : Result.from_err(this.data! as E);
+        : Result.fromErr(this.data! as E);
     }
 
     cloned(): Result<T, E> {
@@ -214,20 +214,20 @@ namespace R2STD {
     }
 
     err(): Option<E> {
-      return this.is_err()
-        ? Option.from_some(this.data! as E)
-        : Option.from_none();
+      return this.isErr()
+        ? Option.fromSome(this.data! as E)
+        : Option.fromNone();
     }
 
     expect(msg: string): T {
-      if (this.is_err()) {
+      if (this.isErr()) {
         throw msg;
       }
       return this.data! as T;
     }
 
-    expect_err(msg: string): E {
-      if (this.is_ok()) {
+    expectErr(msg: string): E {
+      if (this.isOk()) {
         throw msg;
       }
       return this.data! as E;
@@ -238,129 +238,129 @@ namespace R2STD {
       return this;
     }
 
-    inspect_err(f: (v: E) => void): Result<T, E> {
-      this.map_err((v) => f(v));
+    inspectErr(f: (v: E) => void): Result<T, E> {
+      this.mapErr((v) => f(v));
       return this;
     }
 
-    is_err(): boolean {
-      return !this.data_is_ok;
+    isErr(): boolean {
+      return !this.dataIsOk;
     }
 
-    is_err_and(f: (v: E) => boolean): boolean {
-      return !this.data_is_ok && f(this.data! as E);
+    isErrAnd(f: (v: E) => boolean): boolean {
+      return !this.dataIsOk && f(this.data! as E);
     }
 
-    is_ok(): boolean {
-      return this.data_is_ok;
+    isOk(): boolean {
+      return this.dataIsOk;
     }
 
-    is_ok_and(f: (v: T) => boolean): boolean {
-      return this.data_is_ok && f(this.data! as T);
+    isOkAnd(f: (v: T) => boolean): boolean {
+      return this.dataIsOk && f(this.data! as T);
     }
 
     iter(): Iterator<T> {
-      return this.is_ok() ? new Iterator([this.data! as T]) : new Iterator([]);
+      return this.isOk() ? new Iterator([this.data! as T]) : new Iterator([]);
     }
 
     map<U>(f: (v: T) => U): Result<U, E> {
-      return this.is_ok()
-        ? Result.from_ok(f(this.data! as T))
-        : Result.from_err(this.data! as E);
+      return this.isOk()
+        ? Result.fromOk(f(this.data! as T))
+        : Result.fromErr(this.data! as E);
     }
 
-    map_err<U>(f: (v: E) => U): Result<T, U> {
-      return this.is_err()
-        ? Result.from_err(f(this.data! as E))
-        : Result.from_ok(this.data! as T);
+    mapErr<U>(f: (v: E) => U): Result<T, U> {
+      return this.isErr()
+        ? Result.fromErr(f(this.data! as E))
+        : Result.fromOk(this.data! as T);
     }
 
-    map_or<U>(default_: U, f: (v: T) => U): Result<U, E> {
-      return this.is_ok()
-        ? Result.from_ok(f(this.data! as T))
-        : Result.from_ok(default_);
+    mapOr<U>(default_: U, f: (v: T) => U): Result<U, E> {
+      return this.isOk()
+        ? Result.fromOk(f(this.data! as T))
+        : Result.fromOk(default_);
     }
-    map_or_else<U>(default_: (e: E) => U, f: (v: T) => U): Result<U, E> {
-      return this.is_ok()
-        ? Result.from_ok(f(this.data! as T))
-        : Result.from_ok(default_(this.data! as E));
+    mapOrElse<U>(default_: (e: E) => U, f: (v: T) => U): Result<U, E> {
+      return this.isOk()
+        ? Result.fromOk(f(this.data! as T))
+        : Result.fromOk(default_(this.data! as E));
     }
 
     ok(): Option<T> {
-      return this.is_ok()
-        ? Option.from_some(this.data! as T)
-        : Option.from_none();
+      return this.isOk()
+        ? Option.fromSome(this.data! as T)
+        : Option.fromNone();
     }
 
     or(o: Result<T, E>): Result<T, E> {
-      if (this.is_ok()) {
+      if (this.isOk()) {
         return this;
-      } else if (o.is_ok()) {
+      } else if (o.isOk()) {
         return o;
       } else {
-        return Result.from_err(this.data! as E);
+        return Result.fromErr(this.data! as E);
       }
     }
 
-    or_else(f: (e: E) => Result<T, E>): Result<T, E> {
-      if (this.is_ok()) {
+    orElse(f: (e: E) => Result<T, E>): Result<T, E> {
+      if (this.isOk()) {
         return this;
       }
       let o = f(this.data! as E);
-      if (o.is_ok()) {
+      if (o.isOk()) {
         return o;
       } else {
-        return Result.from_err(this.data! as E);
+        return Result.fromErr(this.data! as E);
       }
     }
 
     transpose(this: Result<Option<T>, E>): Option<Result<T, E>> {
-      if (this.is_ok()) {
+      if (this.isOk()) {
         let res = this.data! as Option<T>;
-        return res.is_some()
-          ? Option.from_some(Result.from_ok(res.unwrap()))
-          : Option.from_none();
+        return res.isSome()
+          ? Option.fromSome(Result.fromOk(res.unwrap()))
+          : Option.fromNone();
       } else {
         let res = this.data! as E;
-        return Option.from_some(Result.from_err(res));
+        return Option.fromSome(Result.fromErr(res));
       }
     }
 
     unwrap(): T {
-      if (this.is_err()) {
+      if (this.isErr()) {
         throw "called `Result.unwrap()` on a `Err` value";
       }
       return this.data! as T;
     }
 
-    unwrap_err(): E {
-      if (this.is_ok()) {
+    unwrapErr(): E {
+      if (this.isOk()) {
         throw "called `Result.unwrap()` on a `Ok()` value";
       }
       return this.data! as E;
     }
 
-    unwrap_or(v: T): T {
-      return this.is_ok() ? (this.data! as T) : v;
+    unwrapOr(v: T): T {
+      return this.isOk() ? (this.data! as T) : v;
     }
 
-    unwrap_or_else(f: () => T): T {
-      return this.is_ok() ? (this.data! as T) : f();
+    unwrapOrElse(f: () => T): T {
+      return this.isOk() ? (this.data! as T) : f();
     }
 
     constructor(
       private data: T | E,
-      private data_is_ok: boolean,
+      private dataIsOk: boolean,
     ) {
       this.data = data;
-      this.data_is_ok = data_is_ok;
+      this.dataIsOk = dataIsOk;
     }
 
-    static from_ok<T, E>(data: T): Result<T, E> {
+    static fromOk<T, E>(data: T): Result<T, E> {
       return new Result<T, E>(data, true);
     }
 
-    static from_err<T, E>(error: E): Result<T, E> {
+    static fromErr<T, E>(error: E): Result<T, E> {
       return new Result<T, E>(error, false);
     }
   }
@@ -384,7 +384,7 @@ namespace R2STD {
     }
 
     any(f: (i: I) => boolean): boolean {
-      return this.find(f).is_some();
+      return this.find(f).isSome();
     }
 
     chain(o: Iterator<I>): Iterator<I> {
@@ -414,96 +414,96 @@ namespace R2STD {
     }
 
     enumerate(): Iterator<[number, I]> {
-      let new_inner: Array<[number, I]> = [];
+      let newInner: Array<[number, I]> = [];
 
       for (let i = 0; i < this.inner.length; i++) {
-        new_inner = [...new_inner, [i, this.inner[i]]];
+        newInner = [...newInner, [i, this.inner[i]]];
       }
 
-      return new Iterator(new_inner);
+      return new Iterator(newInner);
     }
 
     filter(f: (i: I) => boolean): Iterator<I> {
-      let new_inner: Array<I> = [];
+      let newInner: Array<I> = [];
 
-      this.for_each((i) => {
+      this.forEach((i) => {
         if (f(i)) {
-          new_inner = [...new_inner, i];
+          newInner = [...newInner, i];
         }
       });
 
-      return new Iterator(new_inner);
+      return new Iterator(newInner);
     }
 
-    filter_map<B>(f: (i: I) => Option<B>): Iterator<B> {
-      let new_inner: Array<B> = [];
+    filterMap<B>(f: (i: I) => Option<B>): Iterator<B> {
+      let newInner: Array<B> = [];
 
-      this.for_each((i) => {
+      this.forEach((i) => {
         let res = f(i);
-        if (res.is_some()) {
-          new_inner = [...new_inner, res.unwrap()];
+        if (res.isSome()) {
+          newInner = [...newInner, res.unwrap()];
         }
       });
 
-      return new Iterator(new_inner);
+      return new Iterator(newInner);
     }
 
     find(f: (i: I) => boolean): Option<I> {
       for (let i = 0; i < this.inner.length; i++) {
         if (f(this.inner[i])) {
-          return Option.from_some(this.inner[i]);
+          return Option.fromSome(this.inner[i]);
         }
       }
-      return Option.from_none();
+      return Option.fromNone();
     }
 
-    find_map(f: (i: I) => Option<I>): Option<I> {
+    findMap(f: (i: I) => Option<I>): Option<I> {
       for (let i = 0; i < this.inner.length; i++) {
         let item = f(this.inner[i]);
-        if (item.is_some()) {
+        if (item.isSome()) {
           return item;
         }
       }
-      return Option.from_none();
+      return Option.fromNone();
     }
 
-    flat_map(f: (i: I) => Iterator<I>): Iterator<I> {
-      let new_inner: Array<I> = [];
-      this.for_each((i) => {
+    flatMap(f: (i: I) => Iterator<I>): Iterator<I> {
+      let newInner: Array<I> = [];
+      this.forEach((i) => {
         let iter = f(i);
-        iter.for_each((j) => {
-          new_inner = [...new_inner, j];
+        iter.forEach((j) => {
+          newInner = [...newInner, j];
         });
       });
-      return new Iterator(new_inner);
+      return new Iterator(newInner);
     }
 
     flatten(this: Iterator<Iterator<I>>): Iterator<I> {
-      let new_inner: Array<I> = [];
-      this.for_each((i) => {
-        i.for_each((j) => {
-          new_inner = [...new_inner, j];
+      let newInner: Array<I> = [];
+      this.forEach((i) => {
+        i.forEach((j) => {
+          newInner = [...newInner, j];
         });
       });
-      return new Iterator(new_inner);
+      return new Iterator(newInner);
     }
 
     fold<B>(init: B, f: (accum: B, i: I) => B): B {
       let accum = init;
-      this.for_each((i) => {
+      this.forEach((i) => {
         accum = f(accum, i);
       });
       return accum;
     }
 
-    for_each(f: (i: I) => void) {
+    forEach(f: (i: I) => void) {
       for (let i = 0; i < this.inner.length; i++) {
         f(this.inner[i]);
       }
     }
 
     inspect(f: (i: I) => void): Iterator<I> {
-      this.for_each(f);
+      this.forEach(f);
       return this;
     }
 
@@ -512,24 +512,24 @@ namespace R2STD {
     }
 
     map<B>(f: (i: I) => B): Iterator<B> {
-      let new_inner: Array<B> = [];
-      this.for_each((i) => {
+      let newInner: Array<B> = [];
+      this.forEach((i) => {
         let item = f(i);
-        new_inner = [...new_inner, item];
+        newInner = [...newInner, item];
       });
-      return new Iterator(new_inner);
+      return new Iterator(newInner);
     }
 
-    map_while<B>(f: (i: I) => Option<B>): Iterator<B> {
-      let new_inner: Array<B> = [];
+    mapWhile<B>(f: (i: I) => Option<B>): Iterator<B> {
+      let newInner: Array<B> = [];
       for (let i = 0; i < this.inner.length; i++) {
         let item = f(this.inner[i]);
-        if (item.is_none()) {
+        if (item.isNone()) {
           break;
         }
-        new_inner.push(item.unwrap());
+        newInner.push(item.unwrap());
       }
-      return new Iterator(new_inner);
+      return new Iterator(newInner);
     }
 
     nth(nth: number): I {
@@ -539,7 +539,7 @@ namespace R2STD {
     partition(f: (i: I) => [I, I]): [Array<I>, Array<I>] {
       let a: Array<I> = [];
       let b: Array<I> = [];
-      this.for_each((i) => {
+      this.forEach((i) => {
         if (f(i)) {
           a = [...a, i];
         } else {
@@ -555,16 +555,16 @@ namespace R2STD {
 
     peak(): Option<I> {
       return this.inner.length != 0
-        ? Option.from_some(this.inner[0])
-        : Option.from_none();
+        ? Option.fromSome(this.inner[0])
+        : Option.fromNone();
     }
 
-    next_if(f: (i: I) => boolean): Option<I> {
+    nextIf(f: (i: I) => boolean): Option<I> {
       let next = this.peak();
-      if (next.is_some() && f(next.unwrap())) {
-        return Option.from_some(next.unwrap());
+      if (next.isSome() && f(next.unwrap())) {
+        return Option.fromSome(next.unwrap());
       }
-      return Option.from_none();
+      return Option.fromNone();
     }
 
     position(f: (i: I) => boolean): Option<number> {
@@ -575,9 +575,9 @@ namespace R2STD {
 
     reduce(f: (accum: I, i: I) => I): Option<I> {
       if (this.inner.length == 0) {
-        return Option.from_none();
+        return Option.fromNone();
       }
-      return Option.from_some(this.fold(this.inner[0], f));
+      return Option.fromSome(this.fold(this.inner[0], f));
     }
 
     rev(): Iterator<I> {
@@ -591,7 +591,7 @@ namespace R2STD {
 
     scan<S, B>(init: S, f: (state: S, i: I) => Option<B>): Iterator<B> {
       let state = init;
-      return this.map_while((i) => {
+      return this.mapWhile((i) => {
         return f(state, i);
       });
     }
@@ -600,59 +600,59 @@ namespace R2STD {
       return new Iterator([...this.inner.slice(n)]);
     }
 
-    skip_while(f: (i: I) => boolean): Iterator<I> {
-      return this.map_while((i) => {
-        return f(i) ? Option.from_some(i) : Option.from_none();
+    skipWhile(f: (i: I) => boolean): Iterator<I> {
+      return this.mapWhile((i) => {
+        return f(i) ? Option.fromSome(i) : Option.fromNone();
       });
     }
 
-    step_by(step: number): Iterator<I> {
-      let new_inner: Array<I> = [];
+    stepBy(step: number): Iterator<I> {
+      let newInner: Array<I> = [];
       for (let i = 0; i < this.inner.length; i += step) {
-        new_inner = [...new_inner, this.inner[i]];
+        newInner = [...newInner, this.inner[i]];
       }
-      return new Iterator(new_inner);
+      return new Iterator(newInner);
     }
 
     take(n: number): Iterator<I> {
-      return this.map_while((i) => {
+      return this.mapWhile((i) => {
         if (n == 0) {
-          return Option.from_none();
+          return Option.fromNone();
         } else {
           n--;
-          return Option.from_some(i);
+          return Option.fromSome(i);
         }
       });
     }
 
-    take_while(f: (i: I) => boolean): Iterator<I> {
-      return this.map_while((i) => {
-        return f(i) ? Option.from_some(i) : Option.from_none();
+    takeWhile(f: (i: I) => boolean): Iterator<I> {
+      return this.mapWhile((i) => {
+        return f(i) ? Option.fromSome(i) : Option.fromNone();
       });
     }
 
-    try_fold<B, E>(init: B, f: (accum: B, i: I) => Result<B, E>): Result<B, E> {
+    tryFold<B, E>(init: B, f: (accum: B, i: I) => Result<B, E>): Result<B, E> {
       let accum = init;
-      let res = this.try_for_each((i) => f(accum, i));
-      return res.is_ok()
-        ? Result.from_ok(accum)
-        : Result.from_err(res.unwrap_err());
+      let res = this.tryForEach((i) => f(accum, i));
+      return res.isOk()
+        ? Result.fromOk(accum)
+        : Result.fromErr(res.unwrapErr());
     }
 
-    try_for_each<B, E>(f: (i: I) => Result<B, E>): Result<void, E> {
+    tryForEach<B, E>(f: (i: I) => Result<B, E>): Result<void, E> {
       for (let i = 0; i < this.inner.length; i++) {
         let res = f(this.inner[i]);
-        if (res.is_err()) {
-          return Result.from_err(res.unwrap_err());
+        if (res.isErr()) {
+          return Result.fromErr(res.unwrapErr());
         }
       }
-      return Result.from_ok(undefined);
+      return Result.fromOk(undefined);
     }
 
     unzip<A, B>(this: Iterator<[A, B]>): [Iterator<A>, Iterator<B>] {
       let a: Array<A> = [];
       let b: Array<B> = [];
-      this.for_each(([ia, ib]) => {
+      this.forEach(([ia, ib]) => {
         a = [...a, ia];
         b = [...b, ib];
       });
@@ -661,18 +661,18 @@ namespace R2STD {
     }
 
     zip<U>(o: Iterator<U>): Iterator<[I, U]> {
-      let new_inner: Array<[I, U]> = [];
+      let newInner: Array<[I, U]> = [];
       for (let i = 0; i < Math.max(this.inner.length, o.inner.length); i++) {
-        new_inner = [...new_inner, [this.inner[i], o.inner[i]]];
+        newInner = [...newInner, [this.inner[i], o.inner[i]]];
       }
-      return new Iterator(new_inner);
+      return new Iterator(newInner);
     }
 
     constructor(private inner: Array<I>) {
       this.inner = inner;
     }
 
-    static from_array<I>(array: Array<I>): Iterator<I> {
+    static fromArray<I>(array: Array<I>): Iterator<I> {
       return new Iterator<I>(array);
     }
   }
