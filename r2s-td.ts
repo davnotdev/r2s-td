@@ -1,6 +1,6 @@
 namespace R2STD {
   export class Option<T> {
-    data: T | null;
+    private data: T | null;
 
     and<U>(o: Option<U>): Option<U> {
       return this.is_some() ? o : Option.from_none();
@@ -131,25 +131,22 @@ namespace R2STD {
         : Option.from_none();
     }
 
-    constructor() {
-      this.data = null;
+    constructor(data: T | null) {
+      this.data = data;
     }
+
     static from_some<T>(data: T): Option<T> {
-      let self = new Option<T>();
-      self.data = data;
-      return self;
+      return new Option<T>(data);
     }
 
     static from_none<T>(): Option<T> {
-      let self = new Option<T>();
-      self.data = null;
-      return self;
+      return new Option<T>(null);
     }
   }
 
   export class Result<T, E> {
-    data: T | E;
-    data_is_ok: boolean;
+    private data: T | E;
+    private data_is_ok: boolean;
 
     and<U>(o: Result<U, E>): Result<U, E> {
       return this.is_ok() ? o : Result.from_err(this.data! as E);
@@ -292,7 +289,198 @@ namespace R2STD {
     }
   }
 
-  export class Iterator<I> {}
+  export class Iterator<I> {
+    private inner: Array<I>;
+
+    next(): Option<I> {
+      return new Option(this.inner[0]);
+    }
+
+    all(f: (i: I) => boolean): boolean {
+      for (let i = 0; i < this.inner.length; i++) {
+        if (!f(this.inner[i])) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    any(f: (i: I) => boolean): boolean {
+      return this.find(f).is_some();
+    }
+
+    chain(o: Iterator<I>): Iterator<I> {
+      return new Iterator([...this.inner.slice(), ...o.inner.slice()]);
+    }
+
+    cloned(): Iterator<I> {
+      return structuredClone(this);
+    }
+
+    collect(): Array<I> {
+      return this.inner.slice();
+    }
+
+    count(): number {
+      return this.inner.length;
+    }
+
+    cycle(): Iterator<I> {
+      let inner = this.inner.slice();
+
+      if (inner.length == 0) {
+        return new Iterator([]);
+      }
+
+      return new Iterator([...inner.slice(1), inner[0]]);
+    }
+
+    enumerate(): Iterator<[number, I]> {
+      let new_inner: Array<[number, I]> = [];
+
+      for (let i = 0; i < this.inner.length; i++) {
+        new_inner.push([i, this.inner[i]]);
+      }
+
+      return new Iterator(new_inner);
+    }
+
+    filter(f: (i: I) => boolean): Iterator<I> {
+      let new_inner: Array<I> = [];
+
+      this.for_each((i) => {
+        if (f(i)) {
+          new_inner.push(i);
+        }
+      });
+
+      return new Iterator(new_inner);
+    }
+
+    filter_map<B>(f: (i: I) => Option<B>): Iterator<B> {
+      let new_inner: Array<B> = [];
+
+      this.for_each((i) => {
+        let res = f(i);
+        if (res.is_some()) {
+          new_inner.push(res.unwrap());
+        }
+      });
+
+      return new Iterator(new_inner);
+    }
+
+    find(f: (i: I) => boolean): Option<I> {
+      for (let i = 0; i < this.inner.length; i++) {
+        if (f(this.inner[i])) {
+          return Option.from_some(this.inner[i]);
+        }
+      }
+      return Option.from_none();
+    }
+
+    find_map(f: (i: I) => Option<I>): Option<I> {
+      for (let i = 0; i < this.inner.length; i++) {
+        let item = f(this.inner[i]);
+        if (item.is_some()) {
+          return item;
+        }
+      }
+      return Option.from_none();
+    }
+
+    flat_map(f: (i: I) => Iterator<I>): Iterator<I> {
+      let new_inner: Array<I> = [];
+      this.for_each((i) => {
+        let iter = f(i);
+        iter.for_each((j) => {
+          new_inner.push(j);
+        });
+      });
+      return new Iterator(new_inner);
+    }
+
+    fold() {}
+
+    for_each(f: (i: I) => void) {
+      for (let i = 0; i < this.inner.length; i++) {
+        f(this.inner[i]);
+      }
+    }
+
+    inspect(f: (i: I) => void): Iterator<I> {
+      this.for_each(f);
+      return this;
+    }
+
+    last(): I {
+      return this.inner[this.inner.length - 1];
+    }
+
+    map<B>(f: (i: I) => B): Iterator<B> {
+      let new_inner: Array<B> = [];
+      this.for_each((i) => {
+        let item = f(i);
+        new_inner.push(item);
+      });
+      return new Iterator(new_inner);
+    }
+
+    map_while<B>(f: (i: I) => Option<B>): Iterator<B> {
+      let new_inner: Array<B> = [];
+      for (let i = 0; i < this.inner.length; i++) {
+        let item = f(this.inner[i]);
+        if (item.is_none()) {
+          break;
+        }
+        new_inner.push(item.unwrap());
+      }
+      return new Iterator(new_inner);
+    }
+
+    nth(nth: number): I {
+      return this.inner[nth];
+    }
+
+    partition() {}
+    peekable() {}
+
+    position(f: (i: I) => boolean): Option<number> {
+      return this.enumerate()
+        .find(([_, i]) => f(i))
+        .map(([idx, _]) => idx);
+    }
+
+    reduce() {}
+
+    rev(): Iterator<I> {
+      let inner = this.inner.slice();
+      return new Iterator(inner.reverse());
+    }
+
+    rposition(f: (i: I) => boolean): Option<number> {
+      return this.rev().position(f);
+    }
+
+    scan() {}
+    size_hint() {}
+    skip() {}
+    skip_while() {}
+    step_by() {}
+    take() {}
+    take_while() {}
+    try_fold() {}
+    try_for_each() {}
+    zip() {}
+
+    constructor(inner: Array<I>) {
+      this.inner = inner;
+    }
+
+    static from_array<I>(array: Array<I>): Iterator<I> {
+      return new Iterator<I>(array);
+    }
+  }
 }
 
 export { R2STD };
