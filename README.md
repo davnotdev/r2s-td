@@ -1,10 +1,12 @@
-# RT3S-TD
+# RST3S-TD
 
 I'm fed up with Javascript!
 I want to make websites, but the builtin functions are painful to use!
 Let's introduce some methods from a well designed language!
 
-*ARR TEE THREE ESS DASH TEE DEE*, also known as known as the Rust TypeScript Stripped STandarD project is a library to reimplement the functionality of Rust's `std::option`, `std::result`, and `std::iter` into Typescript.
+*ARR ESS TEE THREE ESS DASH TEE DEE*, also known as known as the RuSt TypeScript Stripped STandarD project is a library to reimplement functionality from Rust's `std::option`, `std::result`, and `std::iter` into Typescript.
+To be clear, this is NOT a port from Rust.
+There will be semantic differences (see below).
 
 You're welcome.
 
@@ -35,6 +37,36 @@ let c = Iterator.fromArray([1, 2, 3, 4, 5])   //  let c = ([1, 2, 3, 4, 5]).into
     .inspect(([a, b]) => console.log(a, b))   //      .inspect(|(a, b)| eprintln!("{} {}", a, b))
     .collect();                               //      .collect::<Vec<_>>(); 
 ```
+
+## Notable Semantic Differences
+
+### Iterators
+
+Iterators are generally do not write to themselves.
+For example:
+
+Rust:
+```rust
+let a = [1, 2, 3];
+let it = a.iter()
+assert_eq!(Some(&1), iter.next());
+assert_eq!(Some(&2), iter.next());
+assert_eq!(Some(&3), iter.next());
+```
+
+This Library:
+```typescript
+let it = Iterator.fromArray([1, 2, 3]);
+let it1 = it.next();    // it1 = 1 
+let it2 = it1.next();   // it2 = 2
+let it3 = it2.next();   // it3 = 3
+let it4 = it.next();    // it4 = 1
+```
+
+### References
+
+Rust and Javascript handle references and mutability quite differently.
+Please be mindful that just because a closure is a mutable reference in the original, does not mean that this library will accurately capture that behavior. 
 
 ## Documentation
 

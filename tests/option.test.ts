@@ -1,6 +1,5 @@
 import { expect, test } from "bun:test";
-import { Result } from "../src/result";
-import { Option } from "../src/option";
+import { Result, Option } from "../src/rst3s-td";
 
 test("Option.and", () => {
   let x = Option.fromSome(2);
