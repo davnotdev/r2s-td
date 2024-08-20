@@ -1,5 +1,5 @@
 {
-  "name": "r2s-td",
+  "name": "rt3s-td",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "tsup": "^8.2.4"
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4"
   }
 }

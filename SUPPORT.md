@@ -1,4 +1,4 @@
-# R2S-TD Support (std 1.80)
+# RST3S-TD Support (std 1.80)
 
 Unsupported methods include those that are experimental, not applicable, or reliant on comparison / ordering traits. 
 
@@ -169,4 +169,9 @@ Unsupported methods include those that are experimental, not applicable, or reli
 - [ ] ~~unwrap_or_default~~
 - [x] unwrap_or_else
 - [ ] ~~unwrap_unchecked~~
+
+## Extras
+
+- [x] `bool::then` as `Option.then`
+- [x] `bool::then_some` as `Option.thenSome`
 
