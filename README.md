@@ -1,5 +1,7 @@
 # RST3S-TD
 
+[![npm](https://img.shields.io/npm/v/rst3s-td.svg)](https://www.npmjs.com/package/rst3s-td) [![build status](https://github.com/davnotdev/rst3s-td/actions/workflows/buildtest.yml/badge.svg?branch=main)](https://github.com/davnotdev/rst3s-td/actions/workflows/buildtest.yml)
+
 I'm fed up with Javascript!
 I want to make websites, but the builtin functions are painful to use!
 Let's introduce some methods from a well designed language!
