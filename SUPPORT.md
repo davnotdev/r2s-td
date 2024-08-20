@@ -1,0 +1,170 @@
+# R2S-TD Support (std 1.80)
+
+## `std::iter::Iterator` Methods
+
+- [ ] ~~advance_by~~
+- [x] all
+- [x] any
+- [ ] ~~array_chunks~~
+- [ ] ~~by_ref~~
+- [x] chain
+- [x] cloned
+- [ ] ~~cmp~~
+- [ ] ~~cmp_by~~
+- [x] collect
+- [ ] ~~collect_into~~
+- [ ] ~~copied~~
+- [x] count
+- [x] cycle
+- [x] enumerate
+- [ ] ~~eq~~
+- [ ] ~~eq_by~~
+- [x] filter
+- [x] filter_map
+- [x] find
+- [x] find_map
+- [x] flat_map
+- [ ] flatten
+- [x] fold
+- [x] for_each
+- [ ] fuse
+- [ ] ~~ge~~
+- [ ] ~~gt~~
+- [x] inspect
+- [ ] ~~intersperse~~
+- [ ] ~~intersperse_with~~
+- [ ] ~~is_partitioned~~
+- [ ] ~~is_sorted~~
+- [ ] ~~is_sorted_by~~
+- [ ] ~~is_sorted_by_key~~
+- [x] last
+- [ ] ~~le~~
+- [ ] ~~lt~~
+- [x] map
+- [x] map_while
+- [ ] ~~map_windows~~
+- [ ] ~~max~~
+- [ ] ~~max_by~~
+- [ ] ~~max_by_key~~
+- [ ] ~~min~~
+- [ ] ~~min_by~~
+- [ ] ~~min_by_key~~
+- [ ] ~~ne~~
+- [ ] ~~next_chunk~~
+- [x] nth
+- [x] partition
+- [ ] ~~partial_cmp~~
+- [ ] ~~partial_cmp_by~~
+- [ ] ~~partition_in_place~~
+- [x] peekable
+    - [x] peak
+    - [ ] ~~peak_mut~~
+    - [x] next_if
+    - [ ] ~~next_if_eq~~
+- [x] position
+- [ ] ~~product~~
+- [x] reduce
+- [x] rev
+- [x] rposition
+- [x] scan
+- [ ] size_hint
+- [x] skip
+- [x] skip_while
+- [x] step_by
+- [ ] ~~sum~~
+- [x] take
+- [x] take_while
+- [ ] ~~try_collect~~
+- [ ] ~~try_find~~
+- [x] try_fold
+- [x] try_for_each
+- [ ] unzip
+- [x] zip
+
+## `std::option::Option` Methods
+
+- [x] and
+- [x] and_then
+- [ ] ~~as_deref~~
+- [ ] ~~as_deref_mut~~
+- [ ] ~~as_mut~~
+- [ ] ~~as_mut_slice~~
+- [ ] ~~as_pin_mut~~
+- [ ] ~~as_pin_ref~~
+- [ ] ~~as_ref~~
+- [ ] ~~as_slice~~
+- [x] cloned
+- [ ] ~~copied~~
+- [x] expect
+- [x] filter
+- [ ] flatten
+- [ ] get_or_insert
+- [ ] ~~get_or_insert_default~~
+- [ ] ~~get_or_insert_with~~
+- [ ] insert
+- [x] inspect
+- [x] is_none
+- [x] is_some
+- [ ] is_some_and
+- [ ] iter
+- [ ] ~~iter_mut~~
+- [x] map
+- [x] map_or
+- [x] map_or_else
+- [x] ok_or
+- [x] ok_or_else
+- [x] or
+- [x] or_else
+- [x] replace
+- [x] take
+- [ ] take_if
+- [ ] transpose
+- [x] unwrap
+- [x] unwrap_or
+- [ ] ~~unwrap_or_default~~
+- [x] unwrap_or_else
+- [ ] ~~unwrap_unchecked~~
+- [ ] unzip
+- [x] xor
+- [x] zip
+- [ ] ~~zip_with~~
+
+## `std::result::Result` Methods
+
+- [x] and
+- [x] and_then
+- [ ] ~~as_deref~~
+- [ ] ~~as_deref_mut~~
+- [ ] ~~as_mut~~
+- [ ] ~~as_ref~~
+- [x] cloned
+- [ ] ~~copied~~
+- [x] err
+- [x] expect
+- [x] expect_err
+- [ ] flatten
+- [ ] ~~into_err~~
+- [ ] ~~into_ok~~
+- [x] inspect
+- [x] inspect_err
+- [x] is_err
+- [ ] is_err_and
+- [x] is_ok
+- [ ] is_ok_and
+- [x] iter
+- [ ] ~~iter_mut~~
+- [x] map
+- [x] map_err
+- [x] map_or
+- [x] map_or_else
+- [x] ok
+- [x] or
+- [x] or_else
+- [ ] transpose
+- [x] unwrap
+- [x] unwrap_err
+- [x] unwrap_or
+- [ ] ~~unwrap_or_default~~
+- [x] unwrap_or_else
+- [ ] ~~unwrap_unchecked~~
+

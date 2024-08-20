@@ -38,7 +38,9 @@ namespace R2STD {
       return this != null;
     }
 
-    iter() {}
+    iter(): Iterator<T> {
+      return this.is_some() ? new Iterator([this.data!]) : new Iterator([]);
+    }
 
     map<U>(f: (v: T) => U): Option<U> {
       return this.is_some()
@@ -200,7 +202,9 @@ namespace R2STD {
       return this.data_is_ok;
     }
 
-    iter() {}
+    iter(): Iterator<T> {
+      return this.is_ok() ? new Iterator([this.data! as T]) : new Iterator([]);
+    }
 
     map<U>(f: (v: T) => U): Result<U, E> {
       return this.is_ok()
@@ -253,18 +257,18 @@ namespace R2STD {
       }
     }
 
-    unwrap() {
+    unwrap(): T {
       if (this.is_err()) {
         throw "called `Result.unwrap()` on a `Err` value";
       }
-      return this.data!;
+      return this.data! as T;
     }
 
-    unwrap_err() {
+    unwrap_err(): E {
       if (this.is_ok()) {
         throw "called `Result.unwrap()` on a `Ok()` value";
       }
-      return this.data!;
+      return this.data! as E;
     }
 
     unwrap_or(v: T): T {
@@ -339,7 +343,7 @@ namespace R2STD {
       let new_inner: Array<[number, I]> = [];
 
       for (let i = 0; i < this.inner.length; i++) {
-        new_inner.push([i, this.inner[i]]);
+        new_inner = [...new_inner, [i, this.inner[i]]];
       }
 
       return new Iterator(new_inner);
@@ -350,7 +354,7 @@ namespace R2STD {
 
       this.for_each((i) => {
         if (f(i)) {
-          new_inner.push(i);
+          new_inner = [...new_inner, i];
         }
       });
 
@@ -363,7 +367,7 @@ namespace R2STD {
       this.for_each((i) => {
         let res = f(i);
         if (res.is_some()) {
-          new_inner.push(res.unwrap());
+          new_inner = [...new_inner, res.unwrap()];
         }
       });
 
@@ -394,13 +398,19 @@ namespace R2STD {
       this.for_each((i) => {
         let iter = f(i);
         iter.for_each((j) => {
-          new_inner.push(j);
+          new_inner = [...new_inner, j];
         });
       });
       return new Iterator(new_inner);
     }
 
-    fold() {}
+    fold<B>(init: B, f: (accum: B, i: I) => B): B {
+      let accum = init;
+      this.for_each((i) => {
+        accum = f(accum, i);
+      });
+      return accum;
+    }
 
     for_each(f: (i: I) => void) {
       for (let i = 0; i < this.inner.length; i++) {
@@ -421,7 +431,7 @@ namespace R2STD {
       let new_inner: Array<B> = [];
       this.for_each((i) => {
         let item = f(i);
-        new_inner.push(item);
+        new_inner = [...new_inner, item];
       });
       return new Iterator(new_inner);
     }
@@ -442,8 +452,36 @@ namespace R2STD {
       return this.inner[nth];
     }
 
-    partition() {}
-    peekable() {}
+    partition(f: (i: I) => [I, I]): [Array<I>, Array<I>] {
+      let a: Array<I> = [];
+      let b: Array<I> = [];
+      this.for_each((i) => {
+        if (f(i)) {
+          a = [...a, i];
+        } else {
+          b = [...b, i];
+        }
+      });
+      return [a, b];
+    }
+
+    peekable(): Iterator<I> {
+      return this;
+    }
+
+    peak(): Option<I> {
+      return this.inner.length != 0
+        ? Option.from_some(this.inner[0])
+        : Option.from_none();
+    }
+
+    next_if(f: (i: I) => boolean): Option<I> {
+      let next = this.peak();
+      if (next.is_some() && f(next.unwrap())) {
+        return Option.from_some(next.unwrap());
+      }
+      return Option.from_none();
+    }
 
     position(f: (i: I) => boolean): Option<number> {
       return this.enumerate()
@@ -451,7 +489,12 @@ namespace R2STD {
         .map(([idx, _]) => idx);
     }
 
-    reduce() {}
+    reduce(f: (accum: I, i: I) => I): Option<I> {
+      if (this.inner.length == 0) {
+        return Option.from_none();
+      }
+      return Option.from_some(this.fold(this.inner[0], f));
+    }
 
     rev(): Iterator<I> {
       let inner = this.inner.slice();
@@ -462,16 +505,73 @@ namespace R2STD {
       return this.rev().position(f);
     }
 
-    scan() {}
-    size_hint() {}
-    skip() {}
-    skip_while() {}
-    step_by() {}
-    take() {}
-    take_while() {}
-    try_fold() {}
-    try_for_each() {}
-    zip() {}
+    scan<S, B>(init: S, f: (state: S, i: I) => Option<B>): Iterator<B> {
+      let state = init;
+      return this.map_while((i) => {
+        return f(state, i);
+      });
+    }
+
+    skip(n: number): Iterator<I> {
+      return new Iterator([...this.inner.slice(n)]);
+    }
+
+    skip_while(f: (i: I) => boolean): Iterator<I> {
+      return this.map_while((i) => {
+        return f(i) ? Option.from_some(i) : Option.from_none();
+      });
+    }
+
+    step_by(step: number): Iterator<I> {
+      let new_inner: Array<I> = [];
+      for (let i = 0; i < this.inner.length; i += step) {
+        new_inner = [...new_inner, this.inner[i]];
+      }
+      return new Iterator(new_inner);
+    }
+
+    take(n: number): Iterator<I> {
+      return this.map_while((i) => {
+        if (n == 0) {
+          return Option.from_none();
+        } else {
+          n--;
+          return Option.from_some(i);
+        }
+      });
+    }
+
+    take_while(f: (i: I) => boolean): Iterator<I> {
+      return this.map_while((i) => {
+        return f(i) ? Option.from_some(i) : Option.from_none();
+      });
+    }
+
+    try_fold<B, E>(init: B, f: (accum: B, i: I) => Result<B, E>): Result<B, E> {
+      let accum = init;
+      let res = this.try_for_each((i) => f(accum, i));
+      return res.is_ok()
+        ? Result.from_ok(accum)
+        : Result.from_err(res.unwrap_err());
+    }
+
+    try_for_each<B, E>(f: (i: I) => Result<B, E>): Result<void, E> {
+      for (let i = 0; i < this.inner.length; i++) {
+        let res = f(this.inner[i]);
+        if (res.is_err()) {
+          return Result.from_err(res.unwrap_err());
+        }
+      }
+      return Result.from_ok(undefined);
+    }
+
+    zip<U>(o: Iterator<U>): Iterator<[I, U]> {
+      let new_inner: Array<[I, U]> = [];
+      for (let i = 0; i < Math.max(this.inner.length, o.inner.length); i++) {
+        new_inner = [...new_inner, [this.inner[i], o.inner[i]]];
+      }
+      return new Iterator(new_inner);
+    }
 
     constructor(inner: Array<I>) {
       this.inner = inner;
