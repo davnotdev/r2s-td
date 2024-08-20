@@ -1,4 +1,5 @@
-import { Option } from './option'
+import { Option } from "./option";
+import { Iterator } from "./iterator";
 
 class Result<T, E> {
   and<U>(o: Result<U, E>): Result<U, E> {
@@ -110,9 +111,9 @@ class Result<T, E> {
     }
   }
 
-  transpose(this: Result<Option<T>, E>): Option<Result<T, E>> {
+  transpose<U>(this: Result<Option<U>, E>): Option<Result<U, E>> {
     if (this.isOk()) {
-      let res = this.data! as Option<T>;
+      let res = this.data! as Option<U>;
       return res.isSome()
         ? Option.fromSome(Result.fromOk(res.unwrap()))
         : Option.fromNone();

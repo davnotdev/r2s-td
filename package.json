@@ -2,9 +2,11 @@
   "name": "rst3s-td",
   "version": "0.0.2",
   "description": "Rust Iterators and Options in Typescript",
+  "main": "dist/rst3s-td.js",
+  "types": "dist/rst3s-td.d.ts",
   "scripts": {
     "test": "bun test",
-    "build": "bun build src/* --outdir dist"
+    "build": "bunx tsc && bun build src/* --outdir dist"
   },
   "author": "davnotdev",
   "license": "BSD-2-Clause",
