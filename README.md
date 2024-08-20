@@ -13,8 +13,7 @@ Check [SUPPORT.md](./SUPPORT.md) for supported methods.
 ## Example
 
 ```typescript
-import { Iterator, Result, Option } from "rt3s-td";
-
+import { Iterator, Result, Option } from "rst3s-td";
 
 let a = Option.fromSome("Hello")              //  let a = Some("Hello".to_owned())
     .map((s) => s + " World")                 //      .map(|s| s + "World")
