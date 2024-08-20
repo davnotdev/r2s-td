@@ -1,6 +1,6 @@
 {
   "name": "rst3s-td",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Rust Iterators and Options in Typescript",
   "main": "dist/rst3s-td.js",
   "types": "dist/rst3s-td.d.ts",
