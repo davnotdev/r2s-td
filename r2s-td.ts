@@ -1,7 +1,9 @@
 namespace R2STD {
-  export class Option<T> {
-    private data: T | null;
+  //
+  // `std::option::Option`
+  //
 
+  export class Option<T> {
     and<U>(o: Option<U>): Option<U> {
       return this.is_some() ? o : Option.from_none();
     }
@@ -25,17 +27,37 @@ namespace R2STD {
       return this.is_some() && f(this.data!) ? this : Option.from_none();
     }
 
+    flatten(this: Option<Option<T>>): Option<T> {
+      return this.is_some() ? this.unwrap() : Option.from_none();
+    }
+
+    get_or_insert(v: T): T {
+      if (this.is_none()) {
+        this.data = v;
+      }
+      return this.data!;
+    }
+
+    insert(v: T): T {
+      this.data = v;
+      return this.data!;
+    }
+
     inspect(f: (v: T) => void): Option<T> {
       this.map((v) => f(v));
       return this;
     }
 
-    is_none() {
+    is_none(): boolean {
       return this == null;
     }
 
-    is_some() {
+    is_some(): boolean {
       return this != null;
+    }
+
+    is_some_and(f: (v: T) => boolean): boolean {
+      return this != null && f(this.data!);
     }
 
     iter(): Iterator<T> {
@@ -98,10 +120,30 @@ namespace R2STD {
       return this.is_some() ? Option.from_some(old!) : Option.from_none();
     }
 
-    take() {
+    take(): Option<T> {
       let old = this.data;
       this.data = null;
       return this.is_some() ? Option.from_some(old!) : Option.from_none();
+    }
+
+    take_if(f: (v: T) => boolean): Option<T> {
+      if (this.is_some() && f(this.data!)) {
+        let old = this.data;
+        this.data = null;
+        return this.is_some() ? Option.from_some(old!) : Option.from_none();
+      } else {
+        return Option.from_none();
+      }
+    }
+
+    transpose<E>(this: Option<Result<T, E>>): Result<Option<T>, E> {
+      if (this.is_some()) {
+        let res = this.data!;
+        return res.is_ok()
+          ? Result.from_ok(Option.from_some(res.unwrap()))
+          : Result.from_err(res.unwrap_err());
+      }
+      return Result.from_ok(Option.from_none());
     }
 
     unwrap(): T {
@@ -119,6 +161,12 @@ namespace R2STD {
       return this.is_some() ? this.data! : f();
     }
 
+    unzip<U>(this: Option<[T, U]>): [Option<T>, Option<U>] {
+      return this.is_some()
+        ? [Option.from_some(this.data![0]), Option.from_some(this.data![1])]
+        : [Option.from_none(), Option.from_none()];
+    }
+
     xor(o: Option<T>): Option<T> {
       if (this.is_some() && o.is_some()) {
         return Option.from_none();
@@ -133,7 +181,7 @@ namespace R2STD {
         : Option.from_none();
     }
 
-    constructor(data: T | null) {
+    constructor(private data: T | null) {
       this.data = data;
     }
 
@@ -146,10 +194,11 @@ namespace R2STD {
     }
   }
 
-  export class Result<T, E> {
-    private data: T | E;
-    private data_is_ok: boolean;
+  //
+  // `std::option::Result`
+  //
 
+  export class Result<T, E> {
     and<U>(o: Result<U, E>): Result<U, E> {
       return this.is_ok() ? o : Result.from_err(this.data! as E);
     }
@@ -198,8 +247,16 @@ namespace R2STD {
       return !this.data_is_ok;
     }
 
+    is_err_and(f: (v: E) => boolean): boolean {
+      return !this.data_is_ok && f(this.data! as E);
+    }
+
     is_ok(): boolean {
       return this.data_is_ok;
+    }
+
+    is_ok_and(f: (v: T) => boolean): boolean {
+      return this.data_is_ok && f(this.data! as T);
     }
 
     iter(): Iterator<T> {
@@ -257,6 +314,18 @@ namespace R2STD {
       }
     }
 
+    transpose(this: Result<Option<T>, E>): Option<Result<T, E>> {
+      if (this.is_ok()) {
+        let res = this.data! as Option<T>;
+        return res.is_some()
+          ? Option.from_some(Result.from_ok(res.unwrap()))
+          : Option.from_none();
+      } else {
+        let res = this.data! as E;
+        return Option.from_some(Result.from_err(res));
+      }
+    }
+
     unwrap(): T {
       if (this.is_err()) {
         throw "called `Result.unwrap()` on a `Err` value";
@@ -279,8 +348,11 @@ namespace R2STD {
       return this.is_ok() ? (this.data! as T) : f();
     }
 
-    constructor(v: T | E, data_is_ok: boolean) {
-      this.data = v;
+    constructor(
+      private data: T | E,
+      private data_is_ok: boolean,
+    ) {
+      this.data = data;
       this.data_is_ok = data_is_ok;
     }
 
@@ -293,9 +365,11 @@ namespace R2STD {
     }
   }
 
-  export class Iterator<I> {
-    private inner: Array<I>;
+  //
+  // `std::option::Iterator`
+  //
 
+  export class Iterator<I> {
     next(): Option<I> {
       return new Option(this.inner[0]);
     }
@@ -398,6 +472,16 @@ namespace R2STD {
       this.for_each((i) => {
         let iter = f(i);
         iter.for_each((j) => {
+          new_inner = [...new_inner, j];
+        });
+      });
+      return new Iterator(new_inner);
+    }
+
+    flatten(this: Iterator<Iterator<I>>): Iterator<I> {
+      let new_inner: Array<I> = [];
+      this.for_each((i) => {
+        i.for_each((j) => {
           new_inner = [...new_inner, j];
         });
       });
@@ -565,6 +649,17 @@ namespace R2STD {
       return Result.from_ok(undefined);
     }
 
+    unzip<A, B>(this: Iterator<[A, B]>): [Iterator<A>, Iterator<B>] {
+      let a: Array<A> = [];
+      let b: Array<B> = [];
+      this.for_each(([ia, ib]) => {
+        a = [...a, ia];
+        b = [...b, ib];
+      });
+
+      return [new Iterator(a), new Iterator(b)];
+    }
+
     zip<U>(o: Iterator<U>): Iterator<[I, U]> {
       let new_inner: Array<[I, U]> = [];
       for (let i = 0; i < Math.max(this.inner.length, o.inner.length); i++) {
@@ -573,7 +668,7 @@ namespace R2STD {
       return new Iterator(new_inner);
     }
 
-    constructor(inner: Array<I>) {
+    constructor(private inner: Array<I>) {
       this.inner = inner;
     }
 

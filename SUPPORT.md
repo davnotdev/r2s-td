@@ -1,5 +1,7 @@
 # R2S-TD Support (std 1.80)
 
+Unsupported methods include those that are experimental, not applicable, or reliant on comparison / ordering traits. 
+
 ## `std::iter::Iterator` Methods
 
 - [ ] ~~advance_by~~
@@ -24,10 +26,10 @@
 - [x] find
 - [x] find_map
 - [x] flat_map
-- [ ] flatten
+- [x] flatten
 - [x] fold
 - [x] for_each
-- [ ] fuse
+- [ ] ~~fuse~~
 - [ ] ~~ge~~
 - [ ] ~~gt~~
 - [x] inspect
@@ -67,7 +69,7 @@
 - [x] rev
 - [x] rposition
 - [x] scan
-- [ ] size_hint
+- [ ] ~~size_hint~~
 - [x] skip
 - [x] skip_while
 - [x] step_by
@@ -78,7 +80,7 @@
 - [ ] ~~try_find~~
 - [x] try_fold
 - [x] try_for_each
-- [ ] unzip
+- [x] unzip
 - [x] zip
 
 ## `std::option::Option` Methods
@@ -97,16 +99,16 @@
 - [ ] ~~copied~~
 - [x] expect
 - [x] filter
-- [ ] flatten
-- [ ] get_or_insert
+- [x] flatten
+- [x] get_or_insert
 - [ ] ~~get_or_insert_default~~
 - [ ] ~~get_or_insert_with~~
-- [ ] insert
+- [x] insert
 - [x] inspect
 - [x] is_none
 - [x] is_some
-- [ ] is_some_and
-- [ ] iter
+- [x] is_some_and
+- [x] iter
 - [ ] ~~iter_mut~~
 - [x] map
 - [x] map_or
@@ -117,14 +119,14 @@
 - [x] or_else
 - [x] replace
 - [x] take
-- [ ] take_if
-- [ ] transpose
+- [x] take_if
+- [x] transpose
 - [x] unwrap
 - [x] unwrap_or
 - [ ] ~~unwrap_or_default~~
 - [x] unwrap_or_else
 - [ ] ~~unwrap_unchecked~~
-- [ ] unzip
+- [x] unzip
 - [x] xor
 - [x] zip
 - [ ] ~~zip_with~~
@@ -142,15 +144,15 @@
 - [x] err
 - [x] expect
 - [x] expect_err
-- [ ] flatten
+- [ ] ~~flatten~~
 - [ ] ~~into_err~~
 - [ ] ~~into_ok~~
 - [x] inspect
 - [x] inspect_err
 - [x] is_err
-- [ ] is_err_and
+- [x] is_err_and
 - [x] is_ok
-- [ ] is_ok_and
+- [x] is_ok_and
 - [x] iter
 - [ ] ~~iter_mut~~
 - [x] map
@@ -160,7 +162,7 @@
 - [x] ok
 - [x] or
 - [x] or_else
-- [ ] transpose
+- [x] transpose
 - [x] unwrap
 - [x] unwrap_err
 - [x] unwrap_or
